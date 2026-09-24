@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress & Emotion Expressions</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --olive: #6B8E5F;
+            --olive-light: #9BB89A;
+            --terracotta: #C97D5F;
+            --terracotta-light: #E8B4A8;
+            --cream: #F5F1E8;
+            --dark: #2C2C2C;
+            --light-bg: #FAFAF7;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, var(--cream) 0%, #f9f7f2 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: var(--olive);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--olive-light);
+            font-size: 0.95rem;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            padding: 0.75rem 1.25rem;
+            border: 2px solid var(--olive);
+            background: white;
+            color: var(--olive);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: var(--olive);
+            color: white;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .activity {
+            display: none;
+        }
+
+        .activity.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--terracotta);
+        }
+
+        .scenario {
+            font-size: 1.1rem;
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .emoji {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .option {
+            padding: 1rem;
+            border: 2px solid var(--olive-light);
+            background: var(--light-bg);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .option:hover {
+            background: var(--cream);
+            border-color: var(--olive);
+            transform: translateX(4px);
+        }
+
+        .option.selected {
+            background: var(--olive);
+            color: white;
+            border-color: var(--olive);
+        }
+
+        .option.correct {
+            background: var(--olive);
+            color: white;
+            border-color: var(--olive);
+        }
+
+        .option.incorrect {
+            background: #FFE5E5;
+            border-color: #C97D7D;
+            color: #8B3333;
+        }
+
+        .feedback {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: #E8F5E9;
+            color: #2E7D32;
+            border-left: 4px solid var(--olive);
+        }
+
+        .feedback.incorrect {
+            background: #FFEBEE;
+            color: #C62828;
+            border-left: 4px solid #C97D5F;
+        }
+
+        .progress {
+            height: 6px;
+            background: var(--olive-light);
+            border-radius: 3px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--olive);
+            transition: width 0.3s;
+        }
+
+        .dialogue-line {
+            margin-bottom: 1.25rem;
+            padding: 0.75rem;
+            background: var(--light-bg);
+            border-radius: 8px;
+            border-left: 3px solid var(--terracotta);
+        }
+
+        .speaker {
+            font-weight: 600;
+            color: var(--olive);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .dialogue-text {
+            line-height: 1.5;
+        }
+
+        .gap {
+            padding: 0.35rem 0.75rem;
+            background: var(--cream);
+            border-radius: 4px;
+            font-style: italic;
+            color: var(--dark);
+            display: inline-block;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        button {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: var(--olive);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5A7B50;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--terracotta-light);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #D96C51;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .completion-msg {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--olive) 0%, var(--olive-light) 100%);
+            color: white;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+
+        .completion-msg h2 {
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            .card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Stress & Emotions</h1>
+            <p class="subtitle">Choose the right expression for each situation</p>
+        </header>
+
+
+
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <!-- SCENARIO MODE -->
+        <div id="scenario" class="activity active">
+            <div class="card">
+                <div class="scenario" id="scenarioText"></div>
+                <div class="options" id="scenarioOptions"></div>
+                <div class="feedback" id="scenarioFeedback"></div>
+            </div>
+            <div class="button-group">
+                <button class="btn-primary" onclick="nextScenario()">Next →</button>
+                <button class="btn-secondary" onclick="restartScenario()">Restart</button>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script>
+        const scenarios = [
+            {
+                emoji: '😴',
+                situation: "It's Friday night. You've had a long week at work with back-to-back meetings and deadlines, and you finally made plans to go out with friends, but honestly, you just want to skip them and stay home.",
+                expressions: ['I can\'t resist cravings.', 'My emotions get the better of me.', 'I have a lot on my plate.'],
+                correct: 2,
+                explanation: '"I have a lot on my plate" explains why you\'re exhausted and need to stay home. The others don\'t fit—no temptation is pulling you to go out, and you\'re not emotionally overwhelmed, just tired from work.'
+            },
+            {
+                emoji: '🚭',
+                situation: "Your friend keeps pressuring you to go back to a bad habit you quit—drinking every weekend. They say 'just one night won\'t hurt.' You completely disagree and think that logic is flawed.",
+                expressions: ['I can\'t, I just can\'t with that logic.', 'It turned out rough.', 'I\'m not buying into it.'],
+                correct: 2,
+                explanation: '"I\'m not buying into it" means you reject that argument completely. The others don\'t fit—you\'re not refusing something because it\'s rough, and you\'re not hitting a limit on something specific.'
+            },
+            {
+                emoji: '🎬',
+                situation: "You're feeling anxious and overwhelmed after a difficult conversation with your boss. You go home and put on your favorite comfort show that always makes you feel better.",
+                expressions: ['I can\'t resist cravings.', 'I overcame my fears.', 'It does it for me.'],
+                correct: 2,
+                explanation: '"It does it for me" means this show gives you exactly what you need—comfort and relief. The others don\'t fit—you\'re not resisting a temptation, and you didn\'t overcome anything, just soothed yourself.'
+            },
+            {
+                emoji: '⏰',
+                situation: "Your boss suddenly gives you a huge urgent project with an impossible deadline AND your partner needs your help with moving boxes this weekend. Everything is piling on you simultaneously.",
+                expressions: ['I overcame my fears.', 'I\'m not buying into it.', 'So many things at once.'],
+                correct: 2,
+                explanation: '"So many things at once" captures multiple urgent demands hitting you simultaneously. The others don\'t fit—you didn\'t overcome anything (you\'re overwhelmed), and you\'re not rejecting an idea.'
+            },
+            {
+                emoji: '😤',
+                situation: "You woke up feeling irritable and short-tempered. Your roommate asks an innocent question about dinner plans and you snap at them harshly—you feel terrible instantly.",
+                expressions: ['I can\'t resist cravings.', 'It brings me no joy.', 'My emotions take over me.'],
+                correct: 2,
+                explanation: '"My emotions take over me" captures that moment of losing control and reacting before you can stop yourself. The others don\'t fit—no craving is involved, and it\'s not that something brings you no joy.'
+            },
+            {
+                emoji: '🤷',
+                situation: "It's been a draining day and your friends are now pushing you to go to a loud, crowded nightclub. The noise, the crowds, the energy—you just can\'t deal with it.",
+                expressions: ['I overcame my fears.', 'So many things at once.', 'I can\'t with crowds.'],
+                correct: 2,
+                explanation: '"I can\'t with crowds" expresses that specific irritation—when something just grates on you and you\'ve hit your limit with it. The others don\'t fit—you didn\'t overcome anything, and it\'s not about multiple things colliding.'
+            },
+            {
+                emoji: '💨',
+                situation: "You have three essays due tomorrow that you haven\'t started. You keep reaching for your phone to distract yourself instead of working, and you know you\'re sabotaging your own deadline.",
+                expressions: ['I overcame my fears.', 'It turned out rough.', 'I can\'t resist grabbing my phone.'],
+                correct: 2,
+                explanation: '"I can\'t resist grabbing my phone" captures that specific temptation pulling you away from work. The others don\'t fit—you haven\'t overcome anything yet, and nothing has "turned out" rough.'
+            },
+            {
+                emoji: '🎯',
+                situation: "You finally finished a huge project you\'ve been dreading and procrastinating on for weeks. You managed to push past the self-doubt and perfectionism that kept holding you back.",
+                expressions: ['I have a lot on my plate.', 'It brought me no joy.', 'I overcame my fears and obstacles.'],
+                correct: 2,
+                explanation: '"I overcame my fears and obstacles" is exactly what you did—you fought through internal resistance and finished. The others don\'t fit—you don\'t have more work piling up, and this definitely brought you joy and relief.'
+            },
+            {
+                emoji: '🍕',
+                situation: "You promised yourself you\'d cut back on sweets this month. But after a terrible day, you\'re staring at your favorite dessert and the craving is intense—you really want to give in.",
+                expressions: ['I\'m not buying into it.', 'It turned out rough.', 'I can\'t resist cravings.'],
+                correct: 2,
+                explanation: '"I can\'t resist cravings" is exactly what this moment is—that powerful urge for something you want pulling you. The others don\'t fit—you\'re not rejecting an idea, and nothing has "turned out" rough.'
+            },
+            {
+                emoji: '😵',
+                situation: "Today everything collided at once—work deadline, family emergency call, bills you forgot about, friend drama. It\'s all crashing down on you simultaneously and you feel completely overwhelmed.",
+                expressions: ['I can\'t resist grabbing my phone.', 'I can\'t resist cravings.', 'It\'s been quite intense.'],
+                correct: 2,
+                explanation: '"It\'s been quite intense" captures the emotional weight of everything hitting together at once. The others don\'t fit—this isn\'t about a specific temptation pulling you, but about the chaos of multiple crises colliding.'
+            }
+        ];
+
+
+        let currentScenario = 0;
+        let scenarioScores = 0;
+        let selectedOption = null;
+
+
+
+        function loadScenario() {
+            const scenario = scenarios[currentScenario];
+            document.getElementById('scenarioText').innerHTML = `<span class="emoji">${scenario.emoji}</span>${scenario.situation}`;
+            
+            const optionsDiv = document.getElementById('scenarioOptions');
+            optionsDiv.innerHTML = '';
+            selectedOption = null;
+
+            scenario.expressions.forEach((expr, idx) => {
+                const btn = document.createElement('div');
+                btn.className = 'option';
+                btn.textContent = expr;
+                btn.onclick = () => selectScenarioOption(idx);
+                optionsDiv.appendChild(btn);
+            });
+
+            document.getElementById('scenarioFeedback').classList.remove('show');
+            updateProgress();
+        }
+
+        function selectScenarioOption(idx) {
+            selectedOption = idx;
+            const options = document.querySelectorAll('#scenarioOptions .option');
+            options.forEach((opt, i) => {
+                opt.classList.toggle('selected', i === idx);
+            });
+        }
+
+        function nextScenario() {
+            const feedback = document.getElementById('scenarioFeedback');
+            
+            // If showing feedback, move to next question
+            if (feedback.classList.contains('show')) {
+                if (currentScenario < scenarios.length - 1) {
+                    currentScenario++;
+                    loadScenario();
+                } else {
+                    showCompletion('scenario');
+                }
+                return;
+            }
+
+            // If no feedback yet, check answer
+            if (selectedOption === null) return;
+
+            const scenario = scenarios[currentScenario];
+            const options = document.querySelectorAll('#scenarioOptions .option');
+
+            if (selectedOption === scenario.correct) {
+                scenarioScores++;
+                feedback.classList.add('correct');
+                feedback.classList.remove('incorrect');
+                feedback.innerHTML = `✓ <strong>Correct!</strong> ${scenario.explanation}`;
+                options[selectedOption].classList.add('correct');
+            } else {
+                feedback.classList.add('incorrect');
+                feedback.classList.remove('correct');
+                feedback.innerHTML = `✗ Not quite. <strong>Better answer:</strong> "${scenario.expressions[scenario.correct]}" — ${scenario.explanation}`;
+                options[selectedOption].classList.add('incorrect');
+                options[scenario.correct].classList.add('correct');
+            }
+
+            feedback.classList.add('show');
+        }
+
+        function restartScenario() {
+            currentScenario = 0;
+            scenarioScores = 0;
+            selectedOption = null;
+            loadScenario();
+        }
+
+
+        function showCompletion(mode) {
+            const container = document.querySelector(`.activity.active .card`);
+            const score = mode === 'scenario' ? scenarioScores : dialogueScores;
+            const total = mode === 'scenario' ? scenarios.length : dialogues.length;
+
+            container.innerHTML = `
+                <div class="completion-msg">
+                    <h2>Nice work! 🎉</h2>
+                    <p>You got ${score}/${total} correct. These expressions are in your toolkit now.</p>
+                </div>
+            `;
+
+            document.querySelector(`.activity.active .button-group`).innerHTML = `
+                <button class="btn-secondary" onclick="switchMode('${mode === 'scenario' ? 'dialogue' : 'scenario'}')">Try the other mode →</button>
+                <button class="btn-secondary" onclick="location.reload()">Start over</button>
+            `;
+        }
+
+        function updateProgress() {
+            const mode = document.querySelector('.activity.active').id;
+            const total = mode === 'scenario' ? scenarios.length : dialogues.length;
+            const current = mode === 'scenario' ? currentScenario + 1 : currentDialogue + 1;
+            const percent = (current / total) * 100;
+            document.getElementById('progressBar').style.width = percent + '%';
+        }
+
+        // Initialize
+        loadScenario();
+    </script>
+</body>
+</html>
